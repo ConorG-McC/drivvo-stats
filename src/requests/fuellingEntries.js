@@ -15,7 +15,6 @@ export async function getFuellingEntries(token, vehicleId) {
   try {
     const response = await fetch(fuellingEndpoint, requestOptions);
     const result = await response.json();
-    console.log(result);
     if (args.output) {
       await saveJsonToFile('fuellingEntries.json', result);
     }

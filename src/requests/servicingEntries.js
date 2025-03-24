@@ -15,7 +15,6 @@ export async function getServicingEntries(token, vehicleId) {
   try {
     const response = await fetch(servicingEndpoint, requestOptions);
     const result = await response.json();
-    console.log(result);
     if (args.output) {
       await saveJsonToFile('servicingEntries.json', result);
     }
