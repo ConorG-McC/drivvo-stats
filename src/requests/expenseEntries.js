@@ -1,4 +1,7 @@
 import { args, config } from '../config/config.js';
+import { renameKeysDeep } from '../transforms/deepTranslate.js';
+import { EXPENSE_ES_TO_EN } from '../transforms/fieldDictionaries.js';
+
 import { saveJsonToFile } from '../utilities/util.js';
 
 export async function getExpenseEntries(token, vehicleId) {
@@ -15,11 +18,14 @@ export async function getExpenseEntries(token, vehicleId) {
   try {
     const response = await fetch(expenseEndpoint, requestOptions);
     const result = await response.json();
-    // console.log(result);
     if (args.output) {
-      await saveJsonToFile('expenseEntries.json', result);
-      return result;
+      await saveJsonToFile(`spanish/expense_entries.es.${vehicleId}.json`, result);
     }
+    if (args.translate) {
+      const translated = renameKeysDeep(result, EXPENSE_ES_TO_EN );
+      await saveJsonToFile(`english/expense_entries.en.${vehicleId}.json`, translated);
+    }
+    return result;
   } catch (error) {
     console.error(error);
   }
