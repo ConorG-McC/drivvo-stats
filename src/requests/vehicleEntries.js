@@ -15,7 +15,6 @@ export async function getVehicles(token) {
   try {
     const response = await fetch(vehicleEndpoint, requestOptions);
     const result = await response.json();
-    console.log(result);
     if (args.output) {
       await saveJsonToFile('vehicles.json', result);
     }

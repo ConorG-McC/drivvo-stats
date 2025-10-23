@@ -7,9 +7,16 @@ export const config = {
   vehicleEndpoint: '/veiculo/web',
   fuelingEndpoint: `/abastecimento/web`,
   servicingEndpoint: `/servico/web`,
+  expenseEndpoint: `/despesa/web`,
 };
 
 export const args = yargs(hideBin(process.argv))
+  .option('custom', {
+    alias: 'c',
+    description: 'use the custom functionality to add/edit/delete data',
+    type: 'boolean',
+    default: false,
+  })
   .option('vehicle', {
     alias: 'v',
     description:
