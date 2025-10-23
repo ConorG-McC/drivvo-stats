@@ -9,6 +9,7 @@ import { getServicingEntries } from './requests/servicingEntries.js';
 import {
   addExpenseEntries,
   deleteExpenseEntries,
+  getExpenseEntries,
 } from './requests/expenseEntries.js';
 import { args } from './config/config.js';
 
@@ -33,6 +34,7 @@ async function main() {
   if (chosenVehicleId) {
     await getFuellingEntries(authToken, chosenVehicleId);
     await getServicingEntries(authToken, chosenVehicleId);
+    await getExpenseEntries(authToken, chosenVehicleId);
     // should results be returned from these functions instead
     // and then saved to a file here?
   }
