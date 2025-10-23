@@ -1,5 +1,8 @@
 import { args, config } from '../config/config.js';
 import { saveJsonToFile } from '../utilities/util.js';
+import { renameKeysDeep } from '../transforms/deepTranslate.js';
+import { VEHICLE_ES_TO_EN } from '../transforms/fieldDictionaries.js';
+
 
 export async function getVehicles(token) {
   const vehicleEndpoint = `${config.baseUrl}${config.vehicleEndpoint}`;
@@ -16,7 +19,11 @@ export async function getVehicles(token) {
     const response = await fetch(vehicleEndpoint, requestOptions);
     const result = await response.json();
     if (args.output) {
-      await saveJsonToFile('vehicles.json', result);
+      await saveJsonToFile(`spanish/vehicles.es.json`, result);
+    }
+    if (args.translate) {
+      const translated = renameKeysDeep(result, VEHICLE_ES_TO_EN);
+      await saveJsonToFile(`english/vehicles.en.json`, translated);
     }
     return result;
   } catch (error) {

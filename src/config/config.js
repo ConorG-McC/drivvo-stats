@@ -17,6 +17,12 @@ export const args = yargs(hideBin(process.argv))
     type: 'boolean',
     default: false,
   })
+  .option('translate', {
+    alias: 't',
+    description: 'translate the json response data from spanish to english',
+    type: 'boolean',
+    default: true,
+  })
   .option('vehicle', {
     alias: 'v',
     description:
