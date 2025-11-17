@@ -17,12 +17,12 @@ npm install
 
 ### Config
 1. Copy the template environment file and rename it:
-   ```bash
-   cp template.env .env
-   ```
+```bash
+cp template.env .env
+```
 2. Populate `.env` with your Drivvo credentials. The script hashes your password before sending it to the API.
 
-> `.env` is already gitignored but assure you never commit your credentials.
+   > `.env` is already gitignored but assure you never commit your credentials.
 
 ### Run the App
 ```bash
@@ -37,16 +37,3 @@ During the interactive session you'll be asked to:
 
 Every request always writes the untouched Drivvo response to `outputs/spanish/*`. When translation is enabled, a second file mirrors the same data under `outputs/english/*`.
 
-### Example
-```bash
-npm start
-```
-
-## Directory Structure
-```
-/src
-├── /config
-├── /requests
-├── /utilities
-└── main.js
-```
