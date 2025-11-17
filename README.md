@@ -5,7 +5,7 @@ This is a tool for managing Drivvo vehicle data, such as fetching vehicle inform
 ## Quick Start
 
 ### Prerequisites
-- Node.js (v12+)
+- Node.js (v18+) – required for the built-in `fetch` API and `crypto.randomUUID`.
 - npm
 
 ### Setup
@@ -16,52 +16,31 @@ npm install
 ```
 
 ### Config
-1. Create a `.env` in the root:
-```
-DRIVVO_EMAIL=
-DRIVVO_PASSWORD= // this is your hashed password   
-```
+1. Copy the template environment file and rename it:
+   ```bash
+   cp template.env .env
+   ```
+2. Populate `.env` with your Drivvo credentials. The script hashes your password before sending it to the API.
+
+> `.env` is already gitignored but assure you never commit your credentials.
 
 ### Run the App
 ```bash
 npm start
 ```
+You'll be guided through prompts to pick a vehicle, choose which entry types to download, and whether to translate the responses. JSON files are saved automatically under `outputs/`.
 
-### Commands
-- `-v`, `--vehicle`:
-  Filter by vehicle plate or use "all" for the latest added vehicle.
-  ```bash
-  npm start -- -v ABC123
-  ```
-  Defaults to "all" if omitted.
+During the interactive session you'll be asked to:
+- Select a vehicle by number or by typing its plate (defaults to the newest vehicle).
+- Choose which entry buckets to fetch (fuelling, servicing, expenses).
+- Decide whether to generate translated (English-keyed) copies alongside the original Spanish JSON.
 
-- `-o`, `--output`:
-  Save results to JSON files in `outputs` directory.
-  ```bash
-  npm start -- -o
-  ```
-  Defaults to `false` if ommitted.
+Every request always writes the untouched Drivvo response to `outputs/spanish/*`. When translation is enabled, a second file mirrors the same data under `outputs/english/*`.
 
-### Examples
-- **Run with default settings**:
-  ```bash
-  npm start
-  ```
-
-- **Run with a specific vehicle**:
-  ```bash
-  npm start -- -v ABC123
-  ```
-
-- **Run and save output**:
-  ```bash
-  npm start -- -o
-  ```
-
-- **Filter by vehicle and save**:
-  ```bash
-  npm start -- -v ABC123 -o
-  ```
+### Example
+```bash
+npm start
+```
 
 ## Directory Structure
 ```

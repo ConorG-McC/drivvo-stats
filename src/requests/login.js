@@ -1,3 +1,4 @@
+import { md5 } from '../utilities/util.js';
 import { config } from '../config/config.js';
 
 export async function login() {
@@ -5,7 +6,7 @@ export async function login() {
 
   const body = JSON.stringify({
     email: process.env.DRIVVO_EMAIL,
-    senha: process.env.DRIVVO_PASSWORD,
+    senha: md5(process.env.DRIVVO_PASSWORD),
     idioma: 'en',
   });
 
@@ -20,10 +21,22 @@ export async function login() {
 
   try {
     const response = await fetch(tokenEndpoint, requestOptions);
+    if (!response.ok) {
+      console.error(
+        `Drivvo login failed with status ${response.status}: ${response.statusText}`
+      );
+      process.abort();
+    }
+
     const result = await response.json();
-    console.log(result.token);
+    if (!result?.token) {
+      console.error('Drivvo login response did not include an auth token.');
+      return null;
+    }
+
     return result.token;
   } catch (error) {
-    console.error(error);
+    console.error('Unable to log in to the Drivvo API:', error);
+    return null;
   }
 }

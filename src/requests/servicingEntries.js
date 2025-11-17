@@ -1,32 +1,41 @@
-import { args, config } from '../config/config.js';
-import {  SERVICE_ES_TO_EN } from '../transforms/fieldDictionaries.js';
-import { saveJsonToFile } from '../utilities/util.js';
-import { renameKeysDeep } from '../transforms/deepTranslate.js';
+import { config } from "../config/config.js";
+import { SERVICE_ES_TO_EN } from "../transforms/fieldDictionaries.js";
+import { saveJsonToFile } from "../utilities/util.js";
+import { renameKeysDeep } from "../transforms/deepTranslate.js";
 
-
-export async function getServicingEntries(token, vehicleId) {
-  const servicingEndpoint = `${config.baseUrl}/veiculo/${vehicleId}${config.servicingEndpoint}`;
+export async function getServicingEntries(token, vehicleId, translate = true) {
+  const servicingEndpoint =
+    `${config.baseUrl}/veiculo/${vehicleId}${config.servicingEndpoint}`;
 
   const requestOptions = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-Token': token,
+      "X-Token": token,
     },
-    redirect: 'follow',
+    redirect: "follow",
   };
 
   try {
     const response = await fetch(servicingEndpoint, requestOptions);
     const result = await response.json();
-    if (args.output) {
-      await saveJsonToFile(`spanish/servicing_entries.es.${vehicleId}.json`, result);
-    }
-    if (args.translate) {
+    const files = [];
+    const spanishPath = await saveJsonToFile(
+      `spanish/servicing_entries.es.${vehicleId}.json`,
+      result,
+    );
+    files.push(spanishPath);
+    if (translate) {
       const translated = renameKeysDeep(result, SERVICE_ES_TO_EN);
-      await saveJsonToFile(`english/servicing_entries.en.${vehicleId}.json`, translated);
+      const englishPath = await saveJsonToFile(
+        `english/servicing_entries.en.${vehicleId}.json`,
+        translated,
+      );
+      files.push(englishPath);
     }
-    return result;
+
+    return { data: result, files };
   } catch (error) {
     console.error(error);
+    return { data: null, files: [] };
   }
 }
