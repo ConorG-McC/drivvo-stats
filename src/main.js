@@ -1,43 +1,87 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
-import { login } from './requests/login.js';
-import { getVehicles, filterVehicles } from './requests/vehicleEntries.js';
-import { getFuellingEntries } from './requests/fuellingEntries.js';
-import { getServicingEntries } from './requests/servicingEntries.js';
+import { login } from "./requests/login.js";
 import {
-  addExpenseEntries,
-  deleteExpenseEntries,
-  getExpenseEntries,
-} from './requests/expenseEntries.js';
-import { args } from './config/config.js';
+  getVehicles,
+  describeVehicle,
+} from "./requests/vehicleEntries.js";
+import { collectInteractiveOptions } from "./utilities/interactive.js";
+import { logFetchPlanSummary, validateEnvironment } from "./utilities/util.js";
+import { runRequestsByOptions } from "./requests/requestsByOptions.js";
+
+const DEFAULT_FETCH_PLAN = {
+  vehicles: true,
+  fuelling: true,
+  servicing: true,
+  expenses: true,
+};
+
+const DEFAULT_PROMPT_SETTINGS = {
+  fetchPlan: DEFAULT_FETCH_PLAN,
+  translate: true,
+};
+
 
 async function main() {
+  if (!validateEnvironment()) {
+    process.exitCode = 1;
+    return;
+  }
+
   const authToken = await login();
 
   if (!authToken) {
-    console.error('Failed to retrieve auth token, aborting requests.');
+    console.error("Failed to retrieve auth token, aborting requests.");
     return;
   }
 
-  const vehicles = await getVehicles(authToken);
-  const chosenVehicleId = filterVehicles(vehicles);
+  const vehicleResponse = await getVehicles(authToken, true);
+  const vehicles = vehicleResponse?.data;
 
-  if (args.custom) {
-    console.log('custom functionality has been enabled.');
-    // await addExpenseEntries(authToken, chosenVehicleId);
-    // await deleteExpenseEntries(authToken, chosenVehicleId);
+  if (!Array.isArray(vehicles) || vehicles.length === 0) {
+    console.error("Drivvo did not return any vehicles for this account.");
     return;
   }
+
+  const userSelectedOptions = await collectInteractiveOptions(
+    vehicles,
+    DEFAULT_PROMPT_SETTINGS,
+  );
+
+  if (!userSelectedOptions.vehicle) {
+    console.error("Unable to determine which vehicle to use.");
+    return;
+  }
+
+  describeVehicle(userSelectedOptions.vehicle);
+  logFetchPlanSummary(
+    userSelectedOptions.fetchPlan,
+    userSelectedOptions.translate,
+  );
+
+  if (userSelectedOptions.fetchPlan.vehicles) {
+    const saveResult = await getVehicles(
+      authToken,
+      false,
+      vehicles,
+      userSelectedOptions.translate,
+    );
+    if (saveResult?.files?.length) {
+      console.log("\nVehicle entries saved to:");
+      for (const file of saveResult.files) {
+        console.log(`  - ${file}`);
+      }
+    }
+  }
+
+  console.log(`\nProceeding with Vehicle: ${userSelectedOptions.vehicle.placa}`);
+  const chosenVehicleId = userSelectedOptions.vehicle.id_veiculo;
 
   if (chosenVehicleId) {
-    await getFuellingEntries(authToken, chosenVehicleId);
-    await getServicingEntries(authToken, chosenVehicleId);
-    await getExpenseEntries(authToken, chosenVehicleId);
-    // should results be returned from these functions instead
-    // and then saved to a file here?
+    await runRequestsByOptions(authToken, chosenVehicleId, userSelectedOptions);
   }
 }
 
-main();
+await main();

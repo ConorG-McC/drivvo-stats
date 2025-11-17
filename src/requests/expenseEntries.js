@@ -1,49 +1,58 @@
-import { args, config } from '../config/config.js';
-import { renameKeysDeep } from '../transforms/deepTranslate.js';
-import { EXPENSE_ES_TO_EN } from '../transforms/fieldDictionaries.js';
+import crypto from "node:crypto";
+import { config } from "../config/config.js";
+import { renameKeysDeep } from "../transforms/deepTranslate.js";
+import { EXPENSE_ES_TO_EN } from "../transforms/fieldDictionaries.js";
+import { saveJsonToFile } from "../utilities/util.js";
 
-import { saveJsonToFile } from '../utilities/util.js';
-
-export async function getExpenseEntries(token, vehicleId) {
+export async function getExpenseEntries(token, vehicleId, translate = true) {
   const expenseEndpoint = `${config.baseUrl}/veiculo/${vehicleId}/despesa`;
 
   const requestOptions = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-Token': token,
+      "X-Token": token,
     },
-    redirect: 'follow',
+    redirect: "follow",
   };
 
   try {
     const response = await fetch(expenseEndpoint, requestOptions);
     const result = await response.json();
-    if (args.output) {
-      await saveJsonToFile(`spanish/expense_entries.es.${vehicleId}.json`, result);
+    const files = [];
+    const spanishPath = await saveJsonToFile(
+      `spanish/expense_entries.es.${vehicleId}.json`,
+      result,
+    );
+    files.push(spanishPath);
+    if (translate) {
+      const translated = renameKeysDeep(result, EXPENSE_ES_TO_EN);
+      const englishPath = await saveJsonToFile(
+        `english/expense_entries.en.${vehicleId}.json`,
+        translated,
+      );
+      files.push(englishPath);
     }
-    if (args.translate) {
-      const translated = renameKeysDeep(result, EXPENSE_ES_TO_EN );
-      await saveJsonToFile(`english/expense_entries.en.${vehicleId}.json`, translated);
-    }
-    return result;
+
+    return { data: result, files };
   } catch (error) {
     console.error(error);
+    return { data: null, files: [] };
   }
 }
 
 export async function deleteExpenseEntries(token, vehicleId) {
   const expenseDeleteEndpoint = `${config.baseUrl}/despesa`;
 
-  const expenseEntries = await getExpenseEntries(token, vehicleId);
+  const { data: expenseEntries } = await getExpenseEntries(token, vehicleId);
 
-  console.log('entries', expenseEntries);
+  console.log("entries", expenseEntries);
   if (
     !expenseEntries ||
     !Array.isArray(expenseEntries) ||
     expenseEntries.length <= 0
   ) {
     console.error(
-      'No expense entries available or data is not in the expected format.'
+      "No expense entries available or data is not in the expected format.",
     );
     return;
   }
@@ -52,22 +61,22 @@ export async function deleteExpenseEntries(token, vehicleId) {
   let successCount = 0;
   let failCount = 0;
   const requestOptions = {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'X-Token': token,
+      "X-Token": token,
     },
-    redirect: 'follow',
+    redirect: "follow",
   };
 
   for (let i = 0; i < expenseEntries.length; i++) {
-    let currentId = expenseEntries[i]['id_despesa'];
+    let currentId = expenseEntries[i]["id_despesa"];
     const progress = Math.round(((i + 1) / expenseEntries.length) * 100);
 
     try {
       console.log(`[${progress}%] Processing entry for ${currentId}...`);
       const response = await fetch(
         `${expenseDeleteEndpoint}/${currentId}`,
-        requestOptions
+        requestOptions,
       );
       console.log(`✅ Entry deleted for ${currentId}`);
       console.log(response);
@@ -82,13 +91,13 @@ export async function deleteExpenseEntries(token, vehicleId) {
 
       // Decide whether to continue or abort
       if (failCount >= 3) {
-        console.error('Too many consecutive failures, aborting process');
+        console.error("Too many consecutive failures, aborting process");
         break;
       }
     }
   }
   console.log(
-    `Operation complete: ${successCount} entries deleted, ${failCount} failed`
+    `Operation complete: ${successCount} entries deleted, ${failCount} failed`,
   );
 
   return { successCount, failCount };
@@ -97,8 +106,8 @@ export async function deleteExpenseEntries(token, vehicleId) {
 export async function addExpenseEntries(token, vehicleId, options = {}) {
   // Configurable parameters with defaults
   const {
-    startDate = new Date('2022-01-01T09:00:00'),
-    endDate = new Date('2025-03-01T09:00:00'),
+    startDate = new Date("2022-01-01T09:00:00"),
+    endDate = new Date("2025-03-01T09:00:00"),
     expenseAmount = 187.74,
     delayMs = 1000,
     expenseTypeId = 24025950,
@@ -108,7 +117,7 @@ export async function addExpenseEntries(token, vehicleId, options = {}) {
 
   const servicingEndpoint = `${config.baseUrl}/despesa`;
   console.log(
-    `Adding financing entries from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`
+    `Adding financing entries from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
   );
 
   // Generate all entries first
@@ -124,7 +133,7 @@ export async function addExpenseEntries(token, vehicleId, options = {}) {
   console.log(`Generated ${entries.length} monthly entries to process`);
 
   if (dryRun) {
-    console.log('Dry run - no entries will be submitted');
+    console.log("Dry run - no entries will be submitted");
     return entries;
   }
 
@@ -137,17 +146,17 @@ export async function addExpenseEntries(token, vehicleId, options = {}) {
 
     try {
       console.log(
-        `[${progress}%] Processing entry for ${entry.displayDate}...`
+        `[${progress}%] Processing entry for ${entry.displayDate}...`,
       );
 
       const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'X-Token': token,
-          'Content-Type': 'application/json',
+          "X-Token": token,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(entry.data),
-        redirect: 'follow',
+        redirect: "follow",
       };
 
       if (!dryRun) {
@@ -168,14 +177,14 @@ export async function addExpenseEntries(token, vehicleId, options = {}) {
 
       // Decide whether to continue or abort
       if (failCount >= 3) {
-        console.error('Too many consecutive failures, aborting process');
+        console.error("Too many consecutive failures, aborting process");
         break;
       }
     }
   }
 
   console.log(
-    `Operation complete: ${successCount} entries added, ${failCount} failed`
+    `Operation complete: ${successCount} entries added, ${failCount} failed`,
   );
   return { successCount, failCount };
 }
@@ -197,7 +206,7 @@ function generateMonthlyEntries({
     const formattedDate = currentDate
       .toISOString()
       .slice(0, 19)
-      .replace('T', ' ');
+      .replace("T", " ");
     const displayDate = currentDate.toLocaleDateString();
 
     const entryData = {
@@ -215,7 +224,7 @@ function generateMonthlyEntries({
       id_tipo_motivo: null,
       odometro: 0, // 0 stops conflicting odometer values on application
       data: formattedDate,
-      observacao: 'Monthly car finance payment',
+      observacao: "Monthly car finance payment",
       id_forma_pagamento: null,
       id_motorista: null,
     };
