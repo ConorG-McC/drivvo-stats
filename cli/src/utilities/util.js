@@ -2,7 +2,6 @@ import crypto from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-// Default to the root directory and create 'outputs' directory
 const OUTPUT_ROOT = path.join(process.cwd(), 'outputs');
 
 export async function saveJsonToFile(relativePath, data) {
@@ -31,7 +30,7 @@ export function validateEnvironment() {
       `Missing environment variables: ${missing.join(", ")}`,
     );
     console.error(
-      "Create a .env file (or copy template.env) and provide your Drivvo credentials.",
+      "Create a cli/.env file (or copy cli/template.env) and provide your Drivvo credentials.",
     );
     return false;
   }

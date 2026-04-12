@@ -1,16 +1,15 @@
 {
   "name": "drivvo-stats",
   "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "main": "main.js",
+  "private": true,
+  "workspaces": [
+    "cli",
+    "web"
+  ],
   "scripts": {
-    "start": "node src/main.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^16.4.5"
+    "start:cli": "npm run start --workspace drivvo-cli",
+    "dev:web": "npm run dev --workspace drivvo-web",
+    "build:web": "npm run build --workspace drivvo-web",
+    "start:web": "npm run start --workspace drivvo-web"
   }
 }
