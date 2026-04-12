@@ -1,0 +1,13 @@
+services:
+  drivvo-web:
+    build:
+      context: ..
+      dockerfile: web/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DRIVVO_EMAIL=${DRIVVO_EMAIL}
+      - DRIVVO_PASSWORD=${DRIVVO_PASSWORD}
+      - DASHBOARD_USER=${DASHBOARD_USER}
+      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD}

@@ -1,0 +1,9 @@
+.page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 480px; }
+.title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.vehicle { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; text-align: left; cursor: pointer; transition: border-color 0.15s; }
+.vehicle:hover { border-color: var(--blue); }
+.vName { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.inactive { font-size: 0.68rem; font-weight: 500; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+.vMeta { font-size: 0.78rem; color: var(--muted); }

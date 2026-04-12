@@ -1,0 +1,12 @@
+.page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; }
+.title { font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+.sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; }
+.form { display: flex; flex-direction: column; gap: 16px; }
+.label { display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 0.95rem; outline: none; transition: border-color 0.15s; }
+.input:focus { border-color: var(--blue); }
+.error { font-size: 0.82rem; color: var(--red); }
+.button { background: var(--blue); color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.button:disabled { opacity: 0.5; cursor: not-allowed; }
+.button:hover:not(:disabled) { opacity: 0.85; }
