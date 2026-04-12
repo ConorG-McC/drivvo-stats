@@ -1,0 +1,12 @@
+node_modules/
+web/node_modules/
+.next/
+web/.next/
+outputs/
+cli/outputs/
+.env*
+!cli/template.env
+!.env.example
+*.tsbuildinfo
+.DS_Store
+.git/

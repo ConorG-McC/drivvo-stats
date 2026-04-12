@@ -1,6 +1,10 @@
 # drivvo-stats
 
-This is a tool for managing Drivvo vehicle data, such as fetching vehicle information, fueling entries, and servicing records from the Drivvo API. It supports filtering by vehicle plate and saving data to JSON files.
+Tools for working with Drivvo vehicle data.
+
+This repo uses npm workspaces:
+- `cli/` contains the Drivvo data export CLI.
+- `web/` contains the Next.js dashboard.
 
 ## Quick Start
 
@@ -15,25 +19,17 @@ cd <repo-dir>
 npm install
 ```
 
-### Config
-1. Copy the template environment file and rename it:
-```bash
-cp template.env .env
-```
-2. Populate `.env` with your Drivvo credentials. The script hashes your password before sending it to the API.
-
-   > `.env` is already gitignored but assure you never commit your credentials.
-
-### Run the App
+### Run the CLI
 ```bash
 npm start
 ```
-You'll be guided through prompts to pick a vehicle, choose which entry types to download, and whether to translate the responses. JSON files are saved automatically under `outputs/`.
 
-During the interactive session you'll be asked to:
-- Select a vehicle by number or by typing its plate (defaults to the newest vehicle).
-- Choose which entry buckets to fetch (fuelling, servicing, expenses).
-- Decide whether to generate translated (English-keyed) copies alongside the original Spanish JSON.
+### Run the Web
+```bash
+npm run web:dev
+```
 
-Every request always writes the untouched Drivvo response to `outputs/spanish/*`. When translation is enabled, a second file mirrors the same data under `outputs/english/*`.
+## Workspace Docs
 
+- CLI: `cli/README.md`
+- Web: `web/README.md`
