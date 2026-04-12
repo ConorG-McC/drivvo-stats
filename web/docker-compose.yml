@@ -1,13 +1,17 @@
 services:
   drivvo-web:
+    container_name: drivvo-web
     build:
-      context: ..
-      dockerfile: web/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
+      context: .
     environment:
-      - DRIVVO_EMAIL=${DRIVVO_EMAIL}
-      - DRIVVO_PASSWORD=${DRIVVO_PASSWORD}
-      - DASHBOARD_USER=${DASHBOARD_USER}
-      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD}
+      NODE_ENV: production
+      PORT: 3000
+    expose:
+      - '3000'
+    networks:
+      - drivvo-stats-network
+    restart: unless-stopped
+
+networks:
+  drivvo-stats-network:
+    external: true
