@@ -11,20 +11,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
+import type { TooltipContentProps, TooltipValueType } from "recharts"
 
 type ChartDatum = Record<string, string | number | null | undefined>
-
-interface ChartTooltipPayload {
-  dataKey?: string | number
-  value?: string | number
-  color?: string
-}
-
-interface ChartTooltipProps {
-  active?: boolean
-  payload?: ChartTooltipPayload[]
-  label?: string | number
-}
+type ChartTooltipProps = TooltipContentProps<TooltipValueType, string | number>
 
 interface LineChartProps extends React.HTMLAttributes<HTMLDivElement> {
   data: ChartDatum[]
@@ -109,7 +99,7 @@ const LineChart = React.forwardRef<HTMLDivElement, LineChartProps>(
                         {payload.map((entry, index) => (
                           <div key={index} className="flex flex-col">
                             <span className="text-[0.70rem] uppercase text-muted-foreground">
-                              {entry.dataKey}
+                              {String(entry.name ?? entry.dataKey ?? "")}
                             </span>
                             <span className="font-bold" style={{ color: entry.color }}>
                               {valueFormatter(Number(entry.value ?? 0))}

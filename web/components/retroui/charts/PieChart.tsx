@@ -9,18 +9,10 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts"
+import type { TooltipContentProps, TooltipValueType } from "recharts"
 
 type ChartDatum = Record<string, string | number | null | undefined>
-
-interface ChartTooltipPayload {
-  name?: string | number
-  value?: string | number
-}
-
-interface ChartTooltipProps {
-  active?: boolean
-  payload?: ChartTooltipPayload[]
-}
+type ChartTooltipProps = TooltipContentProps<TooltipValueType, string | number>
 
 interface PieChartProps extends React.HTMLAttributes<HTMLDivElement> {
   data: ChartDatum[]
