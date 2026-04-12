@@ -2,16 +2,17 @@ services:
   drivvo-web:
     container_name: drivvo-web
     build:
-      context: .
+      context: ..
+      dockerfile: web/Dockerfile
     environment:
       NODE_ENV: production
       PORT: 3000
     expose:
       - '3000'
     networks:
-      - drivvo-stats-network
+      - drivvo-web-network
     restart: unless-stopped
 
 networks:
-  drivvo-stats-network:
+  drivvo-web-network:
     external: true
